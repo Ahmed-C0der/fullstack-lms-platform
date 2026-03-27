@@ -1,0 +1,165 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String
+  userName    String
+  avatarUrl   String?
+  role        Role     @default(STUDENT)
+  createdAt   DateTime @default(now())
+  // asseted tabels , data is changing from user to another
+  enrollments     Enrollment[]
+  lessonProgress  LessonProgress[]
+  notes           Note[]
+  certificates    Certificate[]
+  courses         Course[]         // courses this user created (instructor)
+}
+
+enum Role {
+  STUDENT
+  INSTRUCTOR
+  ADMIN
+}
+
+// ─────────────────────────────────────────
+// COURSE
+// ─────────────────────────────────────────
+model Course {
+  id           String   @id @default(uuid())
+  title        String   @unique
+  category     String[]
+  description  String
+  isFeatured Boolean @default(false)
+
+  thumbnailUrl String?
+  level        Level    @default(BEGINNER)
+  isPublished  Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  language     String   @default("Arabic")
+
+  instructorId String
+  instructor   User     @relation(fields: [instructorId], references: [id])
+
+  lessons      Lesson[]
+  enrollments  Enrollment[]
+  certificates Certificate[]
+}
+
+enum Level {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+// ─────────────────────────────────────────
+// LESSON
+// ─────────────────────────────────────────
+model Lesson {
+  id              String   @id @default(uuid())
+  courseId        String
+  title           String    @unique
+  category        String?
+  overview        String
+  videoUrl        String?
+  durationSeconds Int      @default(0)
+  orderIndex      Int
+  isPublished     Boolean  @default(false)
+
+  course          Course           @relation(fields: [courseId], references: [id])
+  lessonProgress  LessonProgress[]
+  notes           Note[]
+  attachments     Attachment[]
+}
+
+// ─────────────────────────────────────────
+// ENROLLMENT  (User <-> Course join table)
+// ─────────────────────────────────────────
+model Enrollment {
+  id              String    @id @default(uuid())
+  userId          String
+  courseId        String
+  lastLesson      String?
+  progressPercent Float     @default(0)
+  enrolledAt      DateTime  @default(now())
+  completedAt     DateTime?
+  lastAccessedAt  DateTime?
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])  // a user can only enroll once per course
+}
+
+// ─────────────────────────────────────────
+// LESSON PROGRESS  (User <-> Lesson join table)
+// ─────────────────────────────────────────
+model LessonProgress {
+  id             String    @id @default(uuid())
+  userId         String
+  lessonId       String
+  watchedSeconds Int       @default(0)
+  isCompleted    Boolean   @default(false)
+  lastWatchedAt  DateTime?
+
+  user   User   @relation(fields: [userId], references: [id])
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+  // user have many lessons , lesson have many user so we make sure that don't repeat the user for the same user
+  @@unique([userId, lessonId])  // one progress record per user per lesson
+}
+
+// ─────────────────────────────────────────
+// NOTE
+// ─────────────────────────────────────────
+model Note {
+  id             String   @id @default(uuid())
+  userId         String
+  lessonId       String
+  content        String
+  videoTimestamp Int      @default(0)  // seconds into video when note was written
+  createdAt      DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+}
+
+// ─────────────────────────────────────────
+// ATTACHMENT
+// ─────────────────────────────────────────
+model Attachment {
+  id       String @id @default(uuid())
+  lessonId String
+  fileUrl  String
+  fileName String
+  fileType String  // "pdf", "zip", "docx", etc.
+
+  lesson Lesson @relation(fields: [lessonId], references: [id])
+}
+
+// ─────────────────────────────────────────
+// CERTIFICATE
+// ─────────────────────────────────────────
+model Certificate {
+  id             String   @id @default(uuid())
+  userId         String
+  courseId       String
+  certificateUrl String
+  issuedAt       DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  course Course @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])  // one certificate per user per course
+}
