@@ -56,33 +56,32 @@ export default function Logos() {
             id: 8
         },
     ];
-    const mdWidth = ((Logos.length * 80) + ((Logos.length - 1) * 48)) / 2;
-    const width = ((Logos.length * 60) + ((Logos.length - 1) * 32)) / 2;
-
+    const mdWidth = ((Logos.length * 80) + ((Logos.length - 1) * 48));
+    const width = ((Logos.length * 60) + ((Logos.length - 1) * 32));
+    console.log(mdWidth, width)
     useGSAP(() => {
         tweenRef.current = gsap.to(".logosParent", { xPercent: -50, duration: 10, repeat: -1, ease: "none", });
         gsap.set(containerRef?.current, {
             width: mdWidth,
         });
-        let matchMedia = gsap.matchMedia()
+        
 
-            matchMedia.add({
-                isMobile: "(max-width: 768px)",
-                isDesktop: "(min-width: 769px)",
-            }, (context) => {
-                switch (context.conditions) {
-                    case "isMobile":
-                        gsap.set(containerRef?.current, {
-                            width: width+"px",
-                        });
-                        break;
-                    case "isDesktop":
-                        gsap.set(containerRef?.current, {
-                            width: mdWidth+"px",
-                        });
-                        break;
-                }
-            })
+        let mm = gsap.matchMedia();
+
+mm.add("(min-width: 800px)", () => {
+  gsap.set(".window", {
+            width: mdWidth,
+        });
+});
+
+mm.add("(max-width: 799px)", () => {
+  gsap.set(".window", {
+            width: width,
+        });
+});
+
+
+
     }, { scope: sectionRef });
     const handleMouseEnter = () => tweenRef.current?.pause();
     const handleMouseLeave = () => tweenRef.current?.play();
@@ -92,10 +91,10 @@ export default function Logos() {
                 Trusted by leading organizations worldwide
             </h2>
             {/* Window should its width be half of logos width with gap */}
-            <div className='flex justify-start w-[480px] md:w-[640px] items-center  flex-nowrap gap-8 md:gap-12  pl-4 md:pl-12' ref={containerRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+            <div className='flex justify-center items-center overflow-hidden pl-4 md:pl-12 window bg-amber-300' ref={containerRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
                 {/* tabe */}
 
-                <div className="logosParent">
+                <div className="logosParent flex justify-start items-center flex-nowrap gap-8 md:gap-12">
                     {Logos.map((logo: Logo) => (
                         <div key={logo.id} className={`w-[60px] md:w-[80px] shrink-0 opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0`}>
                             <Image src={logo.img} alt={logo.name} width={80} height={80} objectFit='contain' />
