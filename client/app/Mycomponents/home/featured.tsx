@@ -1,0 +1,88 @@
+"use client"
+import React from 'react'
+import type { ICourse } from '@/app/models/courses'
+import { Spinner } from "@/components/ui/spinner"
+import {
+    Card,
+    CardAction,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from "@/components/ui/card"
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
+export default function Featured() {
+    const [courses, setCourses] = React.useState<ICourse[]>([])
+    const [loading, setLoading] = React.useState<boolean>(false)
+    const [error, setError] = React.useState<string | null>(null)
+    React.useEffect(() => {
+        const fetchCourses = async () => {
+            setLoading(true)
+            setError(null)
+            try {
+                const url = process.env.BACKEND_SERVER || "http://localhost:5000"
+                const response = await fetch(`${url}/api/courses/featured`)
+                const courses = await response.json()
+                if (!response.ok) {
+                    throw new Error(courses.message)
+                }
+                setCourses(courses)
+                console.log(courses.length)
+            } catch (error) {
+                if (error instanceof Error) {
+                    console.log("Auth check failed:", error.message);
+                } else {
+                    console.log("An unexpected error occurred:", error);
+                }
+            }
+            finally {
+                setLoading(false)
+            }
+        }
+        fetchCourses()
+    }, [])
+    return (
+        <section className='w-full  bg-slate-50 dark:bg-slate-900/50'>
+            <div className="container py-16 px-6 sm:px-10 lg:px-20 flex justify-center items-center flex-col gap-10 mx-auto">
+            <div className='text-center max-w-2xl flex flex-col gap-3'>
+                <h2 className='text-3xl md:text-4xl font-bold tracking-tight text-slate-900 dark:text-white'>Featured Courses</h2>
+                <p className='text-lg text-muted-foreground'>Check out our hand-picked selection of top-rated courses to accelerate your career.</p>
+            </div>
+            <div className='w-full max-w-7xl grid grid-cols-auto-fit justify-center items-stretch gap-8'>
+                {loading && <div className="col-span-full flex justify-center py-12"><Spinner /></div>}
+                {error && <p className="col-span-full text-center text-red-500">{error}</p>}
+                {courses?.map((course: ICourse) => (
+                    <Card key={course.id} className="group overflow-hidden flex flex-col transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl border-slate-200 dark:border-slate-800">
+                        <div className="relative aspect-video w-full overflow-hidden">
+                            <div className="absolute inset-0 z-10 bg-black/10 group-hover:bg-black/0 transition-colors duration-300" />
+                            <Image
+                                src={course.thumbnailUrl || "/imgs/course.png"}
+                                alt={course.title}
+                                fill
+                                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                        </div>
+                        <CardHeader className="flex-1">
+                            <CardTitle className="text-xl font-bold line-clamp-2 leading-tight">{course.title}</CardTitle>
+                            <CardDescription className="line-clamp-3 mt-2 text-sm">{course.description}</CardDescription>
+                        </CardHeader>
+                        
+                        <CardFooter className="pt-4 border-t border-slate-100 dark:border-slate-800">
+                            <Button className="w-full bg-primary hover:bg-primary/90 text-white transition-colors" asChild>
+                                <Link href={`/courses/${course.id}`} className="flex items-center justify-center gap-2">
+                                    View Course
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            </Button>
+                        </CardFooter>
+                    </Card>
+                ))}
+                </div>
+            </div>
+        </section>
+    )
+}
