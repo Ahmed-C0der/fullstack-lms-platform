@@ -2,11 +2,14 @@
 
 import { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
-import type { IUser, AuthData } from "@/app/models/user";
+import type { IUser, AuthData } from "@/lib/models";
 
 const AuthContext = createContext<AuthData>({
     user: null,
     isCheckingAuth: true,
+    setUser(user) {
+        
+    },
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -21,10 +24,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             const url = process.env.BACKEND_SERVER || "http://localhost:5000";
             const response: Response = await fetch(`${url}/api/auth/me`, {
                 credentials: "include",
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
             });
 
             // check if res is ok before setUser
@@ -52,6 +51,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const data: AuthData = {
         user,
         isCheckingAuth,
+        // setUser:(user:IUser|null)=>{setUser(user)}
+        setUser
     };
     return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
 };

@@ -4,6 +4,8 @@ import Logos from './home/logos'
 import Testimonials from './home/testimonials'
 import Featured from './home/featured'
 import CTA from './home/cta'
+import Nav from './Mynav'
+import Footer from './footer'
 
 export default function HomePage() {
   return (
@@ -13,6 +15,7 @@ export default function HomePage() {
         <Testimonials/>
         <Featured/>
         <CTA/>
+        <Footer />
     </>
   )
 }

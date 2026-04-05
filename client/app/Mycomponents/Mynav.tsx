@@ -9,7 +9,8 @@ import {
   ChartNoAxesCombinedIcon,
   CodeSquare,
   Album,
-  GraduationCap
+  GraduationCap,
+  PanelLeftIcon
 } from "lucide-react";
 import { ModeToggle } from "./modeToggle";
 import { useAuth } from "@/context/AuthContext"; // get user data by dompine fetch with useContext , creatContext
@@ -28,15 +29,33 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import interactWithDB from "@/lib/getDataFromDB";
+import { IUser } from "@/lib/models";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 function Nav() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { user, isCheckingAuth } = useAuth();
+  const { user, isCheckingAuth, setUser } = useAuth();
+  let loggingOut = false
+  const logoutFuntion = async () => {
+    if (loggingOut) return
+    loggingOut = true
 
+    const { target, isFinished } = await interactWithDB<IUser>("/api/auth/logout","POST")
+    if (target) {
+      if (setUser) {
+        setUser(null)
+        console.log("done")
+      }
+    }
+    loggingOut = !isFinished
+  }
   const toggleMenu = (): void => {
     setIsOpen(!isOpen);
   };
-  console.log(user);
-  console.log(isCheckingAuth);
+
+
 
   interface Link {
     url: string;
@@ -44,11 +63,12 @@ function Nav() {
     id: number;
   }
   const links: Link[] = [
-    { url: "#", id: 1, name: "Home" },
-    { url: "#", id: 2, name: "Courses" },
-    { url: "#", id: 3, name: "programs" },
-    { url: "#", id: 4, name: "pricing" },
-    { url: "#", id: 5, name: "About" },
+    user?{ url: "/userProfile/dashboard", id: 1, name: "Home" }:
+    { url: "/", id: 1, name: "Home" }
+    ,
+    { url: "/courses", id: 2, name: "Courses" },
+    { url: "/myEnrollment", id: 3, name: "My Enrollments" },
+    { url: "/about", id: 5, name: "About" },
   ];
   type UserMenuLinks = {
     name: string;
@@ -83,16 +103,36 @@ function Nav() {
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         {/* logo */}
-        <Link
-          href="/"
-          className="flex items-center hover:opacity-80 transition-opacity"
-        >
-          <GraduationCap className="h-6 w-6 text-foreground" />
-          <span className="ml-2 text-lg font-bold text-foreground tracking-tight">
-            A.C0der
-          </span>
-        </Link>
+        
+          {!isCheckingAuth && user ? <div className="flex items-center gap-1">
+            <SidebarTrigger>
+              <PanelLeftIcon />
+            </SidebarTrigger>
+            <Link
+            href="/"
+            className="flex items-center hover:opacity-80 transition-opacity"
+          >
+            <GraduationCap className="h-6 w-6 text-foreground" />
+            <span className="ml-2 text-lg font-bold text-foreground tracking-tight">
+              A.C0der
+            </span>
+          </Link>
+          </div>
 
+          :
+          <Link
+            href="/"
+            className="flex items-center hover:opacity-80 transition-opacity"
+          >
+            <GraduationCap className="h-6 w-6 text-foreground" />
+            <span className="ml-2 text-lg font-bold text-foreground tracking-tight">
+              A.C0der
+            </span>
+          </Link>
+          
+        }
+
+          
         {/* desktop links */}
         <ul className="hidden md:flex items-center gap-8">
           {links.map((el: Link) => (
@@ -110,79 +150,77 @@ function Nav() {
         {/* icons && DropdownMenu */}
         <div className="flex items-center gap-4">
           <ModeToggle />
-          
+
           <div className="text-muted-foreground hover:text-foreground transition-colors">
             {isCheckingAuth ? (
               // Loading State
               <div className="h-5 w-5 animate-spin rounded-full border-b-2 border-gray-900 dark:border-white"></div>
             ) : user ? (
               // Logged In State
-              <>  
-               <Link href={"/dashboard"}>
-              <ChartNoAxesCombinedIcon />
-            </Link>
-              <DropdownMenu>
-                
-           
-          
-                <DropdownMenuTrigger asChild>
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage
-                      src={
-                        user.avatarUrl?.[0] || "https://github.com/shadcn.png"
-                      }
-                      alt={user.userName}
-                    />
-                    <AvatarFallback>
-                      {user.userName?.charAt(0).toUpperCase() || "CN"}
-                    </AvatarFallback>
-                    <AvatarBadge className="bg-green-600 dark:bg-green-800" />
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuGroup>
-        
-                    {userMenuLinks.map((el: UserMenuLinks) => (
-                      <DropdownMenuItem key={el.id}>
-                        {el.url&&<Link
-                          className="flex items-center gap-2"
-                          href={"/profile"}
-                        >
-                          {el.name} {el.logo||""}
-                        </Link>}
-                      </DropdownMenuItem>
-                    ))}
-                    <DropdownMenuSeparator />
+              <div className='flex items-center gap-2'>
+                <Link href={"/userProfile/dashboard"}>
+                  <ChartNoAxesCombinedIcon />
+                </Link>
+                <DropdownMenu>
 
-                    {user.role === "ADMIN" && (
-                      <DropdownMenuItem>
-                        <Link
-                          className="flex items-center gap-2"
-                          href={"/dashboard"}
-                        >
-                          Dashboard <User className="h-4 w-4" />
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem
-                      variant="destructive"
-                      onClick={() => (window.location.href = "/auth")}
-                    >
-                      {/* Using simple redirect or could use auth context logout function if exposed here, but Link to /auth where logout happens or simple text is fine. 
+
+
+                  <DropdownMenuTrigger asChild>
+                    <Avatar className="cursor-pointer">
+                      <AvatarImage
+                        src={
+                          user.avatarUrl?.[0] || "https://github.com/shadcn.png"
+                        }
+                        alt={user.userName}
+                      />
+                      <AvatarFallback>
+                        {user.userName?.charAt(0).toUpperCase() || "CN"}
+                      </AvatarFallback>
+                      <AvatarBadge className="bg-green-600 dark:bg-green-800" />
+                    </Avatar>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuGroup>
+
+                      {userMenuLinks.map((el: UserMenuLinks) => (
+                        <DropdownMenuItem key={el.id}>
+                          {el.url && <Link
+                            className="flex items-center gap-2"
+                            href={"/profile"}
+                          >
+                            {el.name} {el.logo || ""}
+                          </Link>}
+                        </DropdownMenuItem>
+                      ))}
+                      <DropdownMenuSeparator />
+
+                      {user.role === "ADMIN" && (
+                        <DropdownMenuItem>
+                          <Link
+                            className="flex items-center gap-2"
+                            href={"/dashboard"}
+                          >
+                            Dashboard <User className="h-4 w-4" />
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onClick={logoutFuntion}
+                      >
+                        {/* Using simple redirect or could use auth context logout function if exposed here, but Link to /auth where logout happens or simple text is fine. 
                              Better: Use Context Logout if available. I will assume it's just a link for now or add onClick logic if I could.
                             
                           */}
-                      <Link
-                        className="flex items-center gap-2 w-full"
-                        href={"/auth"}
-                      >
-                        Logout <LogOut className="h-4 w-4" />
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-              </>
+
+                        
+                          Logout <LogOut className="h-4 w-4" />
+
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
               // Guest State
               <DropdownMenu>
@@ -192,12 +230,12 @@ function Nav() {
                 <DropdownMenuContent>
                   <DropdownMenuGroup>
                     <DropdownMenuItem>
-                      <Link href={"/auth?status=loign"} className="w-full">
+                      <Link href={"/login"} className="w-full">
                         Login
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem>
-                      <Link href={"/auth?status=register"} className="w-full">
+                      <Link href={"/register"} className="w-full">
                         register
                       </Link>
                     </DropdownMenuItem>
@@ -206,12 +244,7 @@ function Nav() {
               </DropdownMenu>
             )}
           </div>
-          {/* <button className="text-muted-foreground hover:text-foreground transition-colors relative">
-            <Link href={"/shoppingPage"}>
-              <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-primary"></span>
-            </Link>
-          </button> */}
+
           {/* Mobile Menu Button */}
           <button
             className="md:hidden text-muted-foreground hover:text-foreground transition-colors"

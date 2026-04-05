@@ -80,3 +80,68 @@ export const useAuth = () => useContext(AuthContext); // instead of in all place
 ## usercoures
 
 ## ....etc
+
+# NOTICE
+it's not real time app so 
+# CRUD
+## Read --> Student
+
+fisrt user get an access to public data of courses not important his role 
+can read his notice if enrollment and attachment
+can get certificates
+
+
+
+
+
+
+
+## Creat --> student, ADMIN , INSTRUCTOR 
+### (STUDENT)
+
+### (NOT STUDENT)
+
+
+## UPDATE --> student, ADMIN , INSTRUCTOR 
+
+
+
+
+
+
+
+## DELETE --> student, ADMIN , INSTRUCTOR 
+
+
+
+
+## DATA JOURNEY IN FRONT END --> combine useContext , useReducer
+
+
+### SORT OF DATA
+
+### user AUTH --> the less
+
+
+###  COURSE --> a bit more than user auth 
+
+
+### ENROLLMENT 
+
+
+
+### LessonsProgress --> the most 
+
+
+
+
+### NOTE --> THE SECOND (STUDENT ONLY)
+
+
+
+### ATTACHMENT (NOT STUDENT ONLY)
+
+
+
+
+### CERTIFICATE --> i don't knoy yet
