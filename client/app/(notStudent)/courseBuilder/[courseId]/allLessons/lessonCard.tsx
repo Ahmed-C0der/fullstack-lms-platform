@@ -30,9 +30,9 @@ export default function LessonCard({ id, title, durationSeconds, overview, categ
     }
     const deleteCard = async ()=>{
         const url = process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000"
-        const response = await fetch(`${url}/api/api/courses/:courseId/lessons/${id}`,{
-            credentials:"include",
-            method:"DELETE"
+        const response = await fetch(`${url}/api/courses/${id}`, {
+            credentials: "include",
+            method: "DELETE"
         })
         if (!response.ok){
             throw new Error
@@ -62,15 +62,17 @@ export default function LessonCard({ id, title, durationSeconds, overview, categ
             </CardContent>
             <CardFooter className='flex flex-col gap-3.5'>
                 <div className="options flex justify-between items-center gap-4">
-                    <div className="opt1 flex justify-between items-center gap-1">
-
-                        <Checkbox id='Is-Featured' value={values?.isPublished} onChange={(e)=>setValues((pre)=>(
-                            {...pre,isPublished:e.currentTarget.value}
-                            ))} />
+                        <Checkbox 
+                            id='Is-Featured' 
+                            checked={values?.isPublished} 
+                            onCheckedChange={(checked) => setValues((pre) => ({
+                                ...pre!,
+                                isPublished: checked === true
+                            }))} 
+                        />
                         <Label htmlFor='Is-Featured'>
-                            isPublished
+                            Is Published
                         </Label>
-                    </div>
                 </div>
                 <div className="logos flex items-center justify-between gap-3">
                     <Button variant={"outline"}>

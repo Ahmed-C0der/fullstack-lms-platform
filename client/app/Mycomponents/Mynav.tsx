@@ -36,20 +36,15 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 function Nav() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const { user, isCheckingAuth, setUser } = useAuth();
-  let loggingOut = false
-  const logoutFuntion = async () => {
-    if (loggingOut) return
-    loggingOut = true
-
-    const { target, isFinished } = await interactWithDB<IUser>("/api/auth/logout","POST")
-    if (target) {
-      if (setUser) {
-        setUser(null)
-        console.log("done")
-      }
-    }
-    loggingOut = !isFinished
+  const { user, isCheckingAuth, logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  
+  const handleLogout = async () => {
+    if (isLoggingOut) return
+    setIsLoggingOut(true)
+    await logout()
+    setIsLoggingOut(false)
+    setIsOpen(false)
   }
   const toggleMenu = (): void => {
     setIsOpen(!isOpen);
@@ -206,16 +201,12 @@ function Nav() {
                       )}
                       <DropdownMenuItem
                         variant="destructive"
-                        onClick={logoutFuntion}
+                        onClick={handleLogout}
+                        disabled={isLoggingOut}
+                        className="cursor-pointer"
                       >
-                        {/* Using simple redirect or could use auth context logout function if exposed here, but Link to /auth where logout happens or simple text is fine. 
-                             Better: Use Context Logout if available. I will assume it's just a link for now or add onClick logic if I could.
-                            
-                          */}
-
-                        
-                          Logout <LogOut className="h-4 w-4" />
-
+                         {isLoggingOut ? "Logging out..." : "Logout"}
+                         <LogOut className="h-4 w-4 ml-auto" />
                       </DropdownMenuItem>
                     </DropdownMenuGroup>
                   </DropdownMenuContent>
@@ -259,42 +250,17 @@ function Nav() {
       {isOpen && (
         <div className="md:hidden border-t border-border bg-background">
           <ul className="flex flex-col p-4 space-y-4">
-            <li>
-              <Link
-                href={"/"}
-                className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={"/products"}
-                className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                Products
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={"/about"}
-                className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                About
-              </Link>
-            </li>
-            <li>
-              <Link
-                href={"/lab"}
-                className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                The Lab
-              </Link>
-            </li>
+            {links.map((link) => (
+              <li key={link.id}>
+                <Link
+                  href={link.url}
+                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.name}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
       )}

@@ -37,7 +37,7 @@ const formSchema = z.object({
   videoUrl: z.string().url("Must be a valid URL."),
   durationSeconds: z.coerce.number().min(1, "Duration must be at least 1 second."),
   orderIndex: z.coerce.number().min(0, "Order index must be 0 or greater."),
-  isPublished: z.boolean().default(false),
+  isPublished: z.boolean(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -105,7 +105,7 @@ export default function BuildLesson() {
       <div className="max-w-6xl mx-auto space-y-8">
         {/* Header Section with Gradient Accent */}
         <div className="relative p-8 rounded-2xl bg-white border border-slate-200 shadow-sm overflow-hidden mb-8">
-          <div className="absolute top-0 left-0 w-2 h-full bg-gradient-to-b from-indigo-500 via-purple-500 to-pink-500" />
+          <div className="absolute top-0 left-0 w-2 h-full bg-linear-to-b from-indigo-500 via-purple-500 to-pink-500" />
           <div className="flex flex-col gap-2">
             <h1 className="text-3xl font-bold tracking-tight text-slate-900 flex items-center gap-3">
               <div className="p-2 bg-indigo-50 rounded-lg">

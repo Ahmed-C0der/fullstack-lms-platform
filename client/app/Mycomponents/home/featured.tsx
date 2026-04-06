@@ -25,7 +25,7 @@ export default function Featured() {
             setLoading(true)
             setError(null)
             try {
-                const url = process.env.BACKEND_SERVER || "http://localhost:5000"
+                const url = process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000"
                 const response = await fetch(`${url}/api/courses/featured`)
                 const courses = await response.json()
                 if (!response.ok) {

@@ -13,7 +13,7 @@ interface ILessonContext {
 }
 const lessonContext = createContext<ILessonContext>({
     lessons:null,
-    isCheckingLessons:false
+    isCheckingLessons:true
 })
 
 export const LessonContextProvider :React.FC<{ children: ReactNode }> =({children})=>{
@@ -26,14 +26,18 @@ export const LessonContextProvider :React.FC<{ children: ReactNode }> =({childre
 
 
     useEffect(()=>{
+        if (!courseId) {
+        setIsCheckingLessons(false)
+        return
+    }
         const Gett = async ()=>{
 
             const {target , isFinished}  = await useLessonsEnrolled<Lesson[]>(`/api/courses/${courseId}/lessons/enrolled`)
             setLessons(target)
-            setIsCheckingLessons(!isFinished)
+            setIsCheckingLessons(false)
         }
         Gett()
-    },[])
+    },[courseId])
     return(
         <lessonContext.Provider value={{lessons,isCheckingLessons}}>
             {children}

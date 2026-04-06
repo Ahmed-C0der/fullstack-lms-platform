@@ -1,5 +1,5 @@
-"use client";
 import { Button } from "@/components/ui/button";
+import React, { useState } from "react";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -38,7 +38,8 @@ interface ILink {
 
 export function AppSidebar() {
     const { courseId } = useParams();
-    const {user , isCheckingAuth,setUser} = useAuth()
+    const { user, isCheckingAuth, logout } = useAuth()
+    const [isLoggingOut, setIsLoggingOut] = useState(false)
 
     const getGlobalLinks = () => {
         const baseLinks: ILink[] = [
@@ -65,20 +66,12 @@ export function AppSidebar() {
 
     const links = getGlobalLinks()
 
-    let loggingOut = false
-    const logoutfunction = async () => {
-    if (loggingOut) return
-    loggingOut = true
-
-    const { target, isFinished } = await interactWithDB<IUser>("/api/auth/logout","POST")
-    if (target) {
-      if (setUser) {
-        setUser(null)
-        console.log("done")
-      }
+    const handleLogout = async () => {
+        if (isLoggingOut) return
+        setIsLoggingOut(true)
+        await logout()
+        setIsLoggingOut(false)
     }
-    loggingOut = !isFinished
-  }
     return (
         <Sidebar variant="sidebar" collapsible="icon">
             <SidebarHeader>
@@ -127,8 +120,13 @@ export function AppSidebar() {
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link href="/profileSetting">Setting</Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem variant="destructive"className="cursor-pointer" onClick={logoutfunction}>
-                    Log Out
+                  <DropdownMenuItem 
+                    variant="destructive" 
+                    className="cursor-pointer" 
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                  >
+                    {isLoggingOut ? "Logging out..." : "Log Out"}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

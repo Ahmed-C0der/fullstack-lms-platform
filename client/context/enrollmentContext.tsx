@@ -26,12 +26,9 @@ export const EnrollmentContextProvider: React.FC<{ children: React.ReactNode }> 
         const Gett = async ()=>{
             const { target, isFinished } = await interactWithDB<Enrollment[]>("/api/enrollments/me")
             setEnrollments(target)
-            console.log(target)
             setisCheck(false)
-            console.log("requset made")
         }
         Gett()
-        console.log("requset made outSide")
     },[user, isCheckingAuth])
     function editLocallEnrollemnts(enrollment:Enrollment){
         setEnrollments((pre)=>[...(pre || []),enrollment])

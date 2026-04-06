@@ -60,6 +60,8 @@ export default function CourseIdPage() {
         const filterdEnrollment = enrollments?.filter((enrollment: Enrollment) => enrollment.courseId === courseId)
         if (filterdEnrollment && filterdEnrollment?.length > 0) {
             router.replace(pathName + "/lessons")
+        } else {
+            setCheck(false) // Only set to false once we know they aren't enrolled and redirected
         }
     }, [enrollments, courseId, pathName, router])
 

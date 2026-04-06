@@ -7,7 +7,7 @@ const interactWithDB = async <T>(
   let target: T | null = null;
   let isFinished: boolean = false;
   try {
-    const BASE_URL = process.env.BACKEND_SERVER || "http://localhost:5000";
+    const BASE_URL = process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000";
     const responst: Response = await fetch(`${BASE_URL}${url}`, {
       credentials: "include",
       method,
@@ -17,7 +17,7 @@ const interactWithDB = async <T>(
       body:body ?JSON.stringify(body) : null
     });
     if (!responst.ok) {
-      throw new Error();
+      throw new Error(`HTTP ${responst.status}: ${responst.statusText}`)
     }
     const result: T = await responst.json();
     target = result;

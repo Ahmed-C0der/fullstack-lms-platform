@@ -3,13 +3,13 @@
 import { ReactNode } from "react";
 import { createContext, useContext, useEffect, useState } from "react";
 import type { IUser, AuthData } from "@/lib/models";
+import interactWithDB from "@/lib/getDataFromDB";
 
 const AuthContext = createContext<AuthData>({
     user: null,
     isCheckingAuth: true,
-    setUser(user) {
-        
-    },
+    setUser(user) {},
+    logout: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
@@ -21,7 +21,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     const getUser = async (): Promise<void> => {
         // fisrt defin url
         try {
-            const url = process.env.BACKEND_SERVER || "http://localhost:5000";
+            const url = process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000";
             const response: Response = await fetch(`${url}/api/auth/me`, {
                 credentials: "include",
             });
@@ -45,14 +45,23 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         }
     };
 
+    const logout = async () => {
+        try {
+            await interactWithDB("/api/auth/logout", "POST")
+            setUser(null)
+        } catch (error) {
+            console.error("Logout failed:", error)
+        }
+    }
+
     useEffect(() => {
         getUser();
     }, []);
     const data: AuthData = {
         user,
         isCheckingAuth,
-        // setUser:(user:IUser|null)=>{setUser(user)}
-        setUser
+        setUser,
+        logout
     };
     return <AuthContext.Provider value={data}>{children}</AuthContext.Provider>;
 };

@@ -26,7 +26,7 @@ export const CoursesProvider: React.FC<{ children: ReactNode }> = ({
   const { user } = useAuth();
   const getCourses = async (): Promise<void> => {
     try {
-      const url = process.env.BACKEND_SERVER || "http://localhost:5000";
+      const url = process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000";
 
       const result = await fetch(`${url}/api/courses`);
       const courses = await result.json();

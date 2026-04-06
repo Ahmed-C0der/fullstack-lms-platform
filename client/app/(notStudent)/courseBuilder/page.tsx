@@ -39,6 +39,8 @@ export default function CourseBuilder() {
     isFeatured: false,
   });
 
+  const getUrl = () => process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000";
+
   // Handle Auth Routing safely avoiding setState within Render
   useEffect(() => {
     if (!isCheckingAuth) {
@@ -53,7 +55,7 @@ export default function CourseBuilder() {
   // Fetch created courses
   const getCoursesForBuilder = async (): Promise<void> => {
     try {
-      const url = process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000"
+      const url = getUrl()
       const response = await fetch(`${url}/api/courses/builder`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
@@ -91,9 +93,21 @@ export default function CourseBuilder() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
+    
+    // Fix: if category, make it an array
+    if (name === "category") {
+      setFormData((prev) => ({
+        ...prev,
+        category: [value as any],
+      }));
+      return;
+    }
+
+    const finalValue = type === "number" ? parseFloat(value) : value;
+    
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "number" ? parseFloat(value) : value,
+      [name]: finalValue,
     }));
   };
 
@@ -102,7 +116,7 @@ export default function CourseBuilder() {
     setIsSubmitting(true);
 
     try {
-      const url = process.env.NEXT_PUBLIC_BACKEND_SERVER || "http://localhost:5000";
+      const url = getUrl();
       const response = await fetch(`${url}/api/courses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -190,7 +204,7 @@ export default function CourseBuilder() {
                                 View All Lessons
                               </Button>
                             </Link>
-                            <Link href={`/courseBuilder/${course.id}/builLesson`} className="w-full">
+                            <Link href={`/courseBuilder/${course.id}/buildLesson`} className="w-full">
                               <Button className="w-full justify-start bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">
                                 Build New Lesson
                               </Button>

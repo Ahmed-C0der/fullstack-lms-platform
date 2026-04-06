@@ -55,7 +55,7 @@ export default function LessonSidbar({lessons, isLoading}: {lessons: Lesson[] | 
                                 lessons.map((lesson: Lesson, index: number) => {
                                     const isActive = lessonId === lesson.id;
                                     // Read actual DB LessonProgress sent via getAllLessonsforEnrolled
-                                    const isCompleted = (lesson as any).lessonProgress?.[0]?.isCompleted || false;
+                                    const isCompleted = lesson.lessonProgress?.[0]?.isCompleted || false;
 
                                     return (
                                         <SidebarMenuItem key={lesson.id}>

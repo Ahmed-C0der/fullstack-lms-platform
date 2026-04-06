@@ -3,8 +3,6 @@ import { useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import HomePage from "./Mycomponents/homePage";
 import { Spinner } from "@/components/ui/spinner";
-import Student from "./Mycomponents/dashboard/studentDashboard";
-import NotStudent from "./Mycomponents/dashboard/notStudentDashboard";
 import { useRouter } from "next/navigation";
 
 export default function Home() {

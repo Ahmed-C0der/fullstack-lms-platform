@@ -12,14 +12,14 @@ export interface IUser {
 export interface AuthData {
     user:IUser|null,
     isCheckingAuth:boolean
-    setUser?:(user:IUser|null)=>void
-    logout?:()=>void
+    setUser: (user:IUser|null)=>void
+    logout: () => Promise<void>
 }
 
 
-export type LEVELS = "Beginner" | "Intermediate" | "Advanced" 
+export type LevelValue = "Beginner" | "Intermediate" | "Advanced" 
 
-export const LEVELS: LEVELS[] = ["Beginner", "Intermediate", "Advanced"];
+export const LEVELS: LevelValue[] = ["Beginner", "Intermediate", "Advanced"];
 
 
 export interface Lesson { // wil used in lessons page to get privat data not public
@@ -38,7 +38,11 @@ export interface Lesson { // wil used in lessons page to get privat data not pub
       lessonProgress:number,
       notes:number,
       attachments:number
-    }
+    };
+    lessonProgress?: Array<{
+        isCompleted: boolean;
+        watchedSeconds: number;
+    }>;
 }
 export const LESSON_FIELD = [
   "id",
@@ -146,4 +150,13 @@ export interface IAttachment {
   fileUrl: string;
   fileName: string;
   fileType: string;
+}
+
+export interface INote {
+  id: string;
+  userId: string;
+  lessonId: string;
+  content: string;
+  videoTimestamp: number;
+  createdAt: string;
 }
