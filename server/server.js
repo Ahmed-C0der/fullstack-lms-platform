@@ -12,6 +12,13 @@ dotenv.config()
 const app = express()
 const PORT = process.env.PORT || 5000
 
+const requiredEnvVars = ['JWT_SECRET_KEY', 'DATABASE_URL']
+for (const envVar of requiredEnvVars) {
+  if (!process.env[envVar]) {
+    console.error(`Missing required environment variable: ${envVar}`)
+    process.exit(1)
+  }
+}
 /*
 Note: Many developers still keep CORS enabled on the backend as a "second layer" of security,
  just in case they want to allow other apps to connect later. But for your Next.js app to work through a proxy,
@@ -30,4 +37,22 @@ app.use("/api/auth", authRouter)
 app.use("/api/courses/:courseId/lessons", getUserInfo, lessonRouter)
 app.use("/api/courses", courseRouter)
 app.use("/api/enrollments", getUserInfo, enrollmentRouter)
+
+
+
+
+
+
+
+app.use((err, req, res, next) => {
+  console.error(err.stack)
+  res.status(500).json({
+    message: process.env.NODE_ENV === 'production'
+      ? 'Internal server error'
+      : err.message
+  })
+})
+
+
+
 app.listen(PORT, () => console.log("server is running on Port :" + PORT))

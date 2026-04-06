@@ -72,6 +72,9 @@ export const getAllLessonsforEnrolled = async (req, res) => {
   }
 };
 export const getAllLessonsForNotStudent = async (req, res) => {
+  if (req.user.role === 'STUDENT') {
+    return res.status(403).json({ message: "Unauthorized" })
+  }
   try {
     const { courseId } = req.params;
 
@@ -125,11 +128,18 @@ export const getLesson = async (req, res) => {
 
 export const postLesson = async (req, res) => {
   const { courseId } = req.params
-
+  const { title, category, overview, videoUrl, durationSeconds, orderIndex, isPublished } = req.body
   try {
     const lesson = await prisma.lesson.create({
       data: {
-        ...req.body, instructor: {
+        title,
+        category,
+        overview,
+        videoUrl,
+        durationSeconds,
+        orderIndex,
+        isPublished,
+        instructor: {
           connect: { id: req.user.id }
         }, course: {
           connect: { id: courseId }
@@ -146,7 +156,7 @@ export const postLesson = async (req, res) => {
 export const putLesson = async (req, res) => {
   const lessonId = getLessonId(req)
   const { courseId } = req.params
-
+  const { title, category, overview, videoUrl, durationSeconds, orderIndex, isPublished } = req.body
   try {
     const lesson = await prisma.lesson.update({
       where: {
@@ -154,7 +164,7 @@ export const putLesson = async (req, res) => {
         courseId,
         instructorId: req.user.id
       },
-      data: { ...req.body }
+      data: { title, category, overview, videoUrl, durationSeconds, orderIndex, isPublished }
     })
 
     success(res, 200, lesson)
@@ -209,42 +219,50 @@ export const postOrPatch = async (req, res) => {
   const id = getUserId(req)
   const { lessonId } = req.params
   try {
-    const progress = await prisma.lessonProgress.findUnique({
-      where: {
-        userId_lessonId: { userId: id, lessonId: lessonId }
-      }
-    })
+    // const progress = await prisma.lessonProgress.findUnique({
+    //   where: {
+    //     userId_lessonId: { userId: id, lessonId: lessonId }
+    //   }
+    // })
     
-    const { watchedSeconds, lastWatchedAt, isCompleted } = req.body
+    // const { watchedSeconds, lastWatchedAt, isCompleted } = req.body
 
-    if (!progress || progress == null) {
-      // make new
-      const newProgress = await prisma.lessonProgress.create({
-        data: {
-          userId: id,
-          lessonId: lessonId,
-          watchedSeconds: watchedSeconds || 0,
-          isCompleted: isCompleted || false,
-          lastWatchedAt: lastWatchedAt || new Date()
-        }
-      })
-      res.status(201).json(newProgress)
-      return
-    }
+    // if (!progress || progress == null) {
+    //   // make new
+    //   const newProgress = await prisma.lessonProgress.create({
+    //     data: {
+    //       userId: id,
+    //       lessonId: lessonId,
+    //       watchedSeconds: watchedSeconds || 0,
+    //       isCompleted: isCompleted || false,
+    //       lastWatchedAt: lastWatchedAt || new Date()
+    //     }
+    //   })
+    //   res.status(201).json(newProgress)
+    //   return
+    // }
 
-    // already exists so update
-    const updateProgress = await prisma.lessonProgress.update({
-      where: {
-        id: progress.id
-      },
-      data: {
-        watchedSeconds: watchedSeconds !== undefined ? watchedSeconds : progress.watchedSeconds,
-        isCompleted: isCompleted !== undefined ? isCompleted : progress.isCompleted,
-        lastWatchedAt: lastWatchedAt || new Date()
-      }
-    })
+    // // already exists so update
+    // const updateProgress = await prisma.lessonProgress.update({
+    //   where: {
+    //     id: progress.id
+    //   },
+    //   data: {
+    //     watchedSeconds: watchedSeconds !== undefined ? watchedSeconds : progress.watchedSeconds,
+    //     isCompleted: isCompleted !== undefined ? isCompleted : progress.isCompleted,
+    //     lastWatchedAt: lastWatchedAt || new Date()
+    //   }
+    // })
 
-    res.status(200).json(updateProgress)
+    // res.status(200).json(updateProgress)
+
+    const progress = await prisma.lessonProgress.upsert({
+  where: { userId_lessonId: { userId: id, lessonId } },
+  update: { watchedSeconds, isCompleted, lastWatchedAt: new Date() },
+  create: { userId: id, lessonId, watchedSeconds: watchedSeconds || 0, isCompleted: false }
+})
+
+    success(res, 200, progress)
   } catch (error) {
     catchError(res, error)
 
@@ -419,6 +437,7 @@ export const postAttachment = async (req, res) => {
         fileType
       }
     })
+    success(res, 201, attachment)
   } catch (error) {
     catchError(res, error);
 

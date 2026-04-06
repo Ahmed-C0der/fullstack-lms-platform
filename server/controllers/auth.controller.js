@@ -1,8 +1,19 @@
 import { prisma } from "../lib/prisma.ts"
 import bcrypt from "bcryptjs"
 import JWT from "jsonwebtoken"
+import { z } from 'zod'
+
+const registerSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  userName: z.string().min(2).max(50)
+})
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+})
 const generateHashPassword = async (password) => {
-    const salt = await bcrypt.genSalt(8)
+    const salt = await bcrypt.genSalt(12)
     const hashPassword = await bcrypt.hash(password, salt)
     return hashPassword
 
@@ -16,7 +27,10 @@ export const register = async (req, res) => {
     try {
         // add user to DB
         // Hash Bassword Before save it
-
+        const validation = registerSchema.safeParse(req.body)
+        if (!validation.success) {
+            return res.status(400).json({ errors: validation.error.flatten() })
+        }
         const hashPassword = await generateHashPassword(password)
         const user = await prisma.user.create({
             data: {
@@ -52,6 +66,10 @@ export const login = async (req, res) => {
     // get email , password
     const { email, password } = req.body
     try {
+        const validation = loginSchema.safeParse(req.body)
+        if (!validation.success) {
+            return res.status(400).json({ errors: validation.error.flatten() })
+        }
         const user = await prisma.user.findUnique({
             where: {
                 email
@@ -128,12 +146,8 @@ export const logout = (req, res) => {
 
 export const getAllUsers = async (req, res) => {
     try {
-        // Ideally we check if req.user.role === 'ADMIN' here
-        // but for now we'll just fetch all users for the dashboard
-        if (req.user.role !== 'INSTRUCTOR' && req.user.role !== 'ADMIN') {
-             // For safety, only let INSTRUCTORS or ADMINS view all users. 
-             // Update this logic based on your specific Role ENUM.
-             // If any auth can view, then we skip this.
+        if (req.user.role !== 'ADMIN') {
+            return res.status(403).json({ message: "Unauthorized" })
         }
 
         const users = await prisma.user.findMany({

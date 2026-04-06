@@ -65,28 +65,47 @@ export const getSpeceficEnrollment = async (req, res) => {
   }
 };
 
-export const update =async ( req, res) => {
+export const update = async (req, res) => {
   try {
-    const {id} = req.user
-    const {courseId} = req.params
-    const {currentLesson} = req.body 
-
+    const { id } = req.user;
+    const { courseId } = req.params;
+    // convert to number to ensure calculations
+    const currentLesson = Number(req.body.currentLesson); 
+    let currentLessonNumber ; 
+    if (!currentLesson || currentLesson == null){
+      const lesson = await prisma.lesson.findFirst({
+        where:{
+          id:req.body.currentLesson
+        }
+      })
+      if(!lesson || lesson == null){
+        return res.status(404).json({ message: "lesson not found" })
+      }
+      currentLessonNumber = lesson.orderIndex 
+    }
     const allLessons = await prisma.lesson.count({
-        where:{
-            courseId
-        }
-    })
-    const percent = (currentLesson / allLessons) * 100
+      where: { courseId }
+    });
+    // make sure course has lessons if not return message
+    if (allLessons === 0) {
+      return success(res, 200, { message: "Course has no lessons yet" });
+    }
+    // make sure currentLesson not greater than allLessons
+    const validatedLesson = currentLessonNumber > allLessons ? allLessons : currentLessonNumber;
+    // calculate the percentage of the course progress
+    const percent = parseFloat(((validatedLesson / allLessons) * 100).toFixed(2));
+    // after we have put any needed steps we update the enrollment
     const enrollment = await prisma.enrollment.update({
-        where:{
-            userId_courseId:{userId:id,courseId}
-        },
-        data:{
-            progressPercent:percent,
-            lastLesson:currentLesson
-        }
-    })
-    success(res,201,enrollment)
+      where: {
+        userId_courseId: { userId: id, courseId }
+      },
+      data: {
+        progressPercent: percent,
+        lastLesson: validatedLesson
+      }
+    });
+
+    success(res, 200, enrollment); 
   } catch (error) {
     catchError(res, error);
   }

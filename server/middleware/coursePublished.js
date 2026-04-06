@@ -37,9 +37,7 @@ export const manyIsPublished = async (req , res , next)=>{
             
         })
         if(courses.length==0){
-            res.status(404).json({message:"these courses not found"})
-        next()
-            return 
+            return res.status(404).json({message:"these courses not found"})
         }
 
         req.courses = courses

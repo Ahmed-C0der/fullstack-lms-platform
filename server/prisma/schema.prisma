@@ -53,7 +53,7 @@ model Course {
   price        Float    @default(0)
   instructorId String
   instructor   User   @relation(fields: [instructorId], references: [id])
-
+  attachments  Attachment[]
   lessons      Lesson[]
   enrollments  Enrollment[]
   certificates Certificate[]
@@ -72,7 +72,7 @@ model Lesson {
   id              String  @id @default(uuid())
   courseId        String
   instructorId    String
-  title           String  @unique
+  title           String
   category        String?
   overview        String
   videoUrl        String?
@@ -80,7 +80,7 @@ model Lesson {
   orderIndex      Int
   isPublished     Boolean @default(false)
   course         Course           @relation(fields: [courseId], references: [id])
-
+  @@unique([courseId, title])
   instructor   User   @relation(fields: [instructorId], references: [id])
   lessonProgress LessonProgress[]
   notes          Note[]
@@ -149,6 +149,7 @@ model Attachment {
   fileName String
   fileType String // "pdf", "zip", "docx", etc.
   courseId String
+  course   Course @relation(fields: [courseId], references: [id])
   lesson Lesson @relation(fields: [lessonId], references: [id])
 }
 

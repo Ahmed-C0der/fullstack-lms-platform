@@ -4,11 +4,17 @@ import success from "../successufull.js";
 
 export const getAllCourses = async (req, res) => {
   try {
+    const { page = 1, limit = 20 } = req.query
     const courses = await prisma.course.findMany({
-      where: {
-        isPublished: true,
-      },
-    });
+      skip: (page - 1) * limit,
+      take: Number(limit),
+      where: { isPublished: true }
+    })
+    // const courses = await prisma.course.findMany({
+    //   where: {
+    //     isPublished: true,
+    //   },
+    // });
     if (courses.length == 0) {
       return catchError(res);
     }
@@ -97,6 +103,8 @@ export const postCourse = async (req, res) => {
 
 export const putCourse = async (req, res) => {
   const instructorId = req.user.id
+  const { level, category,isPublished,title,description,price,thumbnailUrl,isFeatured } = req.body
+  const categoryArray = category.split(",").map((cat) => cat.trim().toUpperCase());
   try {
     const course = await prisma.course.update({
       where: {
@@ -104,7 +112,14 @@ export const putCourse = async (req, res) => {
         instructorId: instructorId 
       },
       data: {
-        ...req.body
+        level: level?.toUpperCase(),
+        category: categoryArray,
+        isPublished,
+        title,
+        description,
+        price,
+        thumbnailUrl,
+        isFeatured
       }
     })
     success(res, 201, course)
