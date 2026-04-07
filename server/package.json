@@ -6,7 +6,13 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio",
+    "prisma:push": "prisma db push",
+    "prisma:reset": "prisma migrate reset",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +28,8 @@
     "express": "^5.2.1",
     "ioredis": "^5.10.0",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.20.0"
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
