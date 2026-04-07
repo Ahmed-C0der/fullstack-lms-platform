@@ -5,14 +5,14 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*', // proxy to backend
+        destination: 'https://fullstack-lms-platform-production.up.railway.app/api/:path*',      
       },
     ]
   },
   /* config options here */
   images: {
-    dangerouslyAllowSVG: true, // تسمح بعرض الـ SVG
-    contentDispositionType: 'attachment', // لزيادة الأمان
+    dangerouslyAllowSVG: true, 
+    contentDispositionType: 'attachment', 
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
