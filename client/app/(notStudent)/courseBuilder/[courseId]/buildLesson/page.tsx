@@ -35,8 +35,8 @@ const formSchema = z.object({
   category: z.string().min(2, "Category is required."),
   overview: z.string().min(10, "Overview must be at least 10 characters."),
   videoUrl: z.string().url("Must be a valid URL."),
-  durationSeconds: z.coerce.number().min(1, "Duration must be at least 1 second."),
-  orderIndex: z.coerce.number().min(0, "Order index must be 0 or greater."),
+  durationSeconds: z.number().min(1, "Duration must be at least 1 second."),
+  orderIndex: z.number().min(0, "Order index must be 0 or greater."),
   isPublished: z.boolean(),
 });
 
@@ -262,7 +262,7 @@ export default function BuildLesson() {
                     <Input 
                       id="durationSeconds"
                       type="number" 
-                      {...register("durationSeconds")}
+                      {...register("durationSeconds", { valueAsNumber: true })}
                       className="h-11 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20" 
                     />
                   </div>
@@ -274,7 +274,7 @@ export default function BuildLesson() {
                     <Input 
                       id="orderIndex"
                       type="number" 
-                      {...register("orderIndex")}
+                      {...register("orderIndex", { valueAsNumber: true })}
                       className="h-11 border-slate-200 focus:border-indigo-500 focus:ring-indigo-500/20" 
                     />
                   </div>
