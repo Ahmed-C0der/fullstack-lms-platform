@@ -1,6 +1,8 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 
 export default function Hero() {
@@ -21,9 +23,12 @@ export default function Hero() {
             Unlock your potential with our premium courses taught by industry leaders. Flexible, affordable, and designed for real-world impact.
           </p>
           <div className="pt-4">
+            <Link href="/courses">
             <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md font-semibold text-base px-8 h-12">
               Explore Courses
+              <ArrowRight />
             </Button>
+            </Link>
           </div>
         </div>
         <div className="relative aspect-square md:aspect-4/3 w-full max-w-lg mx-auto md:max-w-none">
