@@ -1,6 +1,6 @@
 import express from "express"
 import { 
-  addNotes, deleteAttachment, deleteNote, deleteLesson, 
+  addNotes, deleteNote, 
   getAllAttachment, getAllLessons, getAllLessonsforEnrolled, 
   getAllLessonsForNotStudent, getAllOfCourseAttachment, 
   getLesson, getNote, getProgress, postAttachment, 
