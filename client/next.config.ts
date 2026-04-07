@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://fullstack-lms-platform-production.up.railway.app/api/:path*',      
+        // تأكد من إضافة https:// في البداية
+        destination: 'https://fullstack-lms-platform-production.up.railway.app/api/:path*', 
       },
     ]
   },
