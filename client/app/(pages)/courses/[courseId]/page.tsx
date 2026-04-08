@@ -32,10 +32,12 @@ export default function CourseIdPage() {
 
     const [check, setCheck] = useState<boolean>(true) 
     const [lessons, setLessons] = useState<ILessons[] | null>(null)
-
+    const [isEnrolling, setIsEnrolling] = useState<boolean>(false)
     const course = courses?.find((course) => course.id === courseId)
 
     const EnrollNow = async () => {
+        if (isEnrolling) return
+        setIsEnrolling(true)
         if (user) {
             const { target } = await interactWithDB<Enrollment>(`/api/enrollments/${courseId}`, "POST")
             if (target) {
@@ -45,6 +47,7 @@ export default function CourseIdPage() {
         } else {
             router.replace("/login")
         }
+        setIsEnrolling(false)
     }
 
     useEffect(() => {
@@ -146,8 +149,9 @@ export default function CourseIdPage() {
                                 size="lg" 
                                 className="w-full bg-primary hover:bg-primary/90 text-white font-semibold shadow-md py-6 text-lg"
                                 onClick={EnrollNow}
+                                disabled={isEnrolling}
                             >
-                                Enroll Now
+                                {isEnrolling ? "Enrolling..." : "Enroll Now"}
                             </Button>
                             <p className="text-xs text-center text-muted-foreground">
                                 Full lifetime access • Access on mobile and TV
