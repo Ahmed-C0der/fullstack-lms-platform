@@ -10,7 +10,9 @@ import {
   CodeSquare,
   Album,
   GraduationCap,
-  PanelLeftIcon
+  PanelLeftIcon,
+  Mail,
+  Settings
 } from "lucide-react";
 import { ModeToggle } from "./modeToggle";
 import { useAuth } from "@/context/AuthContext"; // get user data by dompine fetch with useContext , creatContext
@@ -76,21 +78,25 @@ function Nav() {
       name: "profile",
       id: 1,
       logo: <User className="h-4 w-4" />,
-      url: "/profile",
+      url: "/userProfile/dashboard",
     },
     {
       name: user ? user.email : "",
       id: 2,
+      url: "/profileSetting",
+      logo: <Mail className="h-4 w-4" />,
     },
     {
       name: user ? user.userName : "",
       id: 3,
+      url: "/profileSetting",
+      logo: <Settings className="h-4 w-4" />,
     },
     {
       name: "Enrollments",
       id: 4,
       logo: <Album className="h-4 w-4" />,
-      url: "/shoppingPage",
+      url: "/myEnrollment",
     },
   ];
 
@@ -181,7 +187,7 @@ function Nav() {
                         <DropdownMenuItem key={el.id}>
                           {el.url && <Link
                             className="flex items-center gap-2"
-                            href={"/profile"}
+                            href={el.url}
                           >
                             {el.name} {el.logo || ""}
                           </Link>}
@@ -193,7 +199,7 @@ function Nav() {
                         <DropdownMenuItem>
                           <Link
                             className="flex items-center gap-2"
-                            href={"/dashboard"}
+                            href={"/AdminDashboard"}
                           >
                             Dashboard <User className="h-4 w-4" />
                           </Link>

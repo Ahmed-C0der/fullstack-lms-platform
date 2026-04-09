@@ -26,7 +26,7 @@ Note: Many developers still keep CORS enabled on the backend as a "second layer"
 
 */
 app.use(cors({
-    origin: process.env.FRONTEND_URL || "https://fullstack-lms-platform-six.vercel.app",
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true
 }))
 
