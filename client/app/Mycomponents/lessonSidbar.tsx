@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 export default function LessonSidbar({lessons, isLoading}: {lessons: Lesson[] | null, isLoading: boolean}) {
     const { courseId, lessonId } = useParams()
-
+    console.log(lessons)
     if (isLoading) {
        return (
          <Sidebar collapsible="icon" className="border-r border-slate-200 dark:border-slate-800">

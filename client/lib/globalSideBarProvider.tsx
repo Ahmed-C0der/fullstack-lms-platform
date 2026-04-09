@@ -15,13 +15,13 @@ export default function SideBarProvider({ children }: { children: React.ReactNod
 
   // ✅ بس استخدم الـ context مباشرة
   const { lessons, isCheckingLessons } = useLessons()
-
+  console.log(lessons)
   const isLessonPage = !!(lessonId && pathname.includes("/lessons/"))
   const isCourseBuilder = pathname.includes("/courseBuilder/")
 
   const renderSidebar = () => {
     if (isLessonPage) {
-      return <LessonSidbar lessons={lessons ?? []} isLoading={isCheckingLessons} />
+      return <LessonSidbar lessons={lessons} isLoading={isCheckingLessons} />
     }
     if (isCourseBuilder) {
       return <CourseBuilderSidebar />

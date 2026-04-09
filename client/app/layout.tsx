@@ -9,6 +9,7 @@ import { Toaster } from "@/components/ui/sonner"
 
 import SideBarProvider from "@/lib/globalSideBarProvider";
 import { EnrollmentContextProvider } from "@/context/enrollmentContext";
+import { LessonContextProvider } from "@/context/LessonContext";
 
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
@@ -50,10 +51,13 @@ export default  function RootLayout({
         >
           <AuthProvider>
             <EnrollmentContextProvider>
+              <LessonContextProvider>
+
               <SideBarProvider>
 
               {children}
               </SideBarProvider>
+              </LessonContextProvider>
             </EnrollmentContextProvider>
               <Toaster />
 

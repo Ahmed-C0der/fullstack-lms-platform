@@ -28,6 +28,7 @@ export const LessonContextProvider :React.FC<{ children: ReactNode }> =({childre
     useEffect(()=>{
         if (!courseId) {
         setIsCheckingLessons(false)
+        console.log("no course id")
         return
     }
         const Gett = async ()=>{
