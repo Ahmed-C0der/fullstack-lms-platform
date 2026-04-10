@@ -101,8 +101,8 @@ function Nav() {
   ];
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
+    <nav className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md transition-all duration-300">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
         {/* logo */}
         
           {!isCheckingAuth && user ? <div className="flex items-center gap-1">
@@ -243,24 +243,31 @@ function Nav() {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-muted-foreground hover:text-foreground transition-colors"
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-all rounded-full"
             onClick={toggleMenu}
+            aria-label="Toggle menu"
           >
-            {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+            {isOpen ? <X className="h-6 w-6 animate-in spin-in-90 duration-300" /> : <Menu className="h-6 w-6 animate-in fade-in duration-300" />}
+          </Button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden border-t border-border bg-background">
-          <ul className="flex flex-col p-4 space-y-4">
+      {/* Mobile Menu Container */}
+      <div 
+        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out border-t border-border bg-background shadow-xl ${
+          isOpen ? "max-h-[80vh] opacity-100" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="flex flex-col p-4 space-y-4">
+          <ul className="space-y-2">
             {links.map((link) => (
               <li key={link.id}>
                 <Link
                   href={link.url}
-                  className="block text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                  className="flex items-center p-3 rounded-xl text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/20 transition-all"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.name}
@@ -268,8 +275,56 @@ function Nav() {
               </li>
             ))}
           </ul>
+          
+          <DropdownMenuSeparator className="md:hidden" />
+          
+          {!user && (
+            <div className="grid grid-cols-2 gap-3 px-2">
+              <Button asChild variant="outline" className="w-full rounded-xl" onClick={() => setIsOpen(false)}>
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild className="w-full rounded-xl" onClick={() => setIsOpen(false)}>
+                <Link href="/register">Register</Link>
+              </Button>
+            </div>
+          )}
+
+          {user && (
+            <div className="space-y-1">
+              <p className="px-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Account</p>
+              {userMenuLinks.map((el) => (
+                <Link
+                  key={el.id}
+                  href={el.url || "#"}
+                  className="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/20 transition-all"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span className="p-2 bg-secondary/50 rounded-lg">{el.logo}</span>
+                  {el.name}
+                </Link>
+              ))}
+              {user.role === "ADMIN" && (
+                <Link
+                  href="/AdminDashboard"
+                  className="flex items-center gap-3 p-3 rounded-xl text-base font-medium text-primary hover:bg-primary/5 transition-all"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span className="p-2 bg-primary/10 rounded-lg"><User className="h-4 w-4" /></span>
+                  Admin Dashboard
+                </Link>
+              )}
+              <Button 
+                variant="destructive" 
+                className="w-full mt-4 flex items-center justify-center gap-2 rounded-xl py-6"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </Button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </nav>
   );
 }

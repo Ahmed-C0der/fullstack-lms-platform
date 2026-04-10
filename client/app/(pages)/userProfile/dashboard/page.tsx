@@ -45,21 +45,21 @@ export default function Dashboard() {
   const inProgressCourses = totalCourses - completedCourses
 
   return (
-    <div className="container mx-auto p-6 space-y-8">
+    <div className="container mx-auto p-4 sm:p-6 space-y-8">
       {/* Welcome Section */}
-      <div className="flex items-center space-x-6 bg-secondary/10 p-6 rounded-2xl border">
-        <Avatar className="w-24 h-24 border-4 border-primary shadow-sm">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6 bg-secondary/10 p-4 sm:p-6 rounded-2xl border text-center sm:text-left">
+        <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-primary shadow-sm">
           <AvatarImage src={user?.avatarUrl || ""} alt={user?.userName} />
-          <AvatarFallback className="text-2xl">{user?.userName?.charAt(0).toUpperCase()}</AvatarFallback>
+          <AvatarFallback className="text-xl sm:text-2xl">{user?.userName?.charAt(0).toUpperCase()}</AvatarFallback>
         </Avatar>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Welcome back, {user?.userName}!</h1>
-          <p className="text-muted-foreground mt-1">Ready to continue your learning journey today?</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Welcome back, {user?.userName}!</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">Ready to continue your learning journey today?</p>
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Enrollments</CardTitle>
@@ -105,7 +105,7 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {enrollments.map((enrolled) => (
               <Card key={enrolled.id} className="overflow-hidden flex flex-col hover:shadow-md transition-shadow group">
                 <div className="relative h-48 w-full bg-secondary/20">
